@@ -1,0 +1,28 @@
+# Python 虛擬環境
+music_agent/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 環境變數（含 API keys）
+.env
+.env.local
+
+# 資料庫檔案
+*.db
+*.sqlite
+
+# 快取
+.cache/
+*.cache
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
+
+# macOS
+.DS_Store
