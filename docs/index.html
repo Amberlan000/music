@@ -476,6 +476,11 @@
     setTimeout(() => openSettingsModal(), 500);
   }
 
+  function apiFetch(url, options = {}) {
+    const headers = { 'ngrok-skip-browser-warning': 'true', ...(options.headers || {}) };
+    return fetch(url, { ...options, headers });
+  }
+
   /* ── User ID ── */
   let userId = localStorage.getItem('muzy_user_id') || generateId();
   function generateId() {
@@ -518,7 +523,7 @@
     const loadingEl = appendLoadingBubble();
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/playlist`, {
+      const res = await apiFetch(`${API_BASE}/playlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, message: msg })
@@ -593,7 +598,7 @@
   /* ── History ── */
   async function loadHistory() {
     try {
-      const res = await fetch(`${API_BASE}/history/${userId}`);
+      const res = await apiFetch(`${API_BASE}/history/${userId}`);
       const data = await res.json();
       const list = document.getElementById('historyList');
       if (!data.history?.length) {
@@ -614,7 +619,7 @@
   /* ── Preferences sidebar ── */
   async function loadPreferences() {
     try {
-      const res = await fetch(`${API_BASE}/preferences/${userId}`);
+      const res = await apiFetch(`${API_BASE}/preferences/${userId}`);
       const data = await res.json();
       const hasData = data.genres?.length || data.artists?.length || data.moods?.length;
       document.getElementById('prefCard').classList.toggle('visible', !!hasData);
@@ -636,7 +641,7 @@
 
   async function checkSpotifyStatus() {
     try {
-      const res = await fetch(`${API_BASE}/spotify/status?user_id=${userId}`);
+      const res = await apiFetch(`${API_BASE}/spotify/status?user_id=${userId}`);
       const data = await res.json();
       spotifyConnected = data.connected;
       updateConnectUI();
@@ -662,7 +667,7 @@
   }
 
   async function connectSpotify() {
-    const res = await fetch(`${API_BASE}/spotify/login?user_id=${userId}`);
+    const res = await apiFetch(`${API_BASE}/spotify/login?user_id=${userId}`);
     const data = await res.json();
     // 用 popup 開啟授權頁面
     const popup = window.open(data.auth_url, 'spotify_auth',
@@ -706,7 +711,7 @@
     document.getElementById('importResult').classList.remove('visible');
 
     try {
-      const res = await fetch(`${API_BASE}/import-playlist`, {
+      const res = await apiFetch(`${API_BASE}/import-playlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, playlist_url: url })
@@ -775,7 +780,7 @@
     if (!url) { msg.style.color='#ff6b6b'; msg.textContent = '請輸入網址'; return; }
     msg.style.color = '#6b6b8a'; msg.textContent = '測試連線中…';
     try {
-      const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(5000) });
+      const res = await apiFetch(`${url}/health`, { signal: AbortSignal.timeout(5000) });
       if (res.ok) {
         API_BASE = url;
         localStorage.setItem('muzy_api_base', url);
